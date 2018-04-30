@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 requests = "*"
 "web3" = "*"
-ethereum = {git = "https://github.com/ethereum/pyethereum.git", ref = "develop"}
+socketio-client-nexus = "*"
 
 [dev-packages]
 
