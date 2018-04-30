@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+import asyncio
+
 from web3 import Web3, HTTPProvider
 from requests import Request, Session
 import binascii
@@ -7,6 +11,7 @@ import hmac
 import hashlib
 import base64
 import json
+import os
 
 base_URL = 'https://kovan.theoceanx.com/api/v0' # The Ocean X staging environment
 
@@ -14,9 +19,10 @@ RESERVE_MARKET_ORDER = base_URL + '/market_order/reserve'
 PLACE_MARKET_ORDER = base_URL + '/market_order/place'
 USER_HISTORY = base_URL + '/user_history'
 
-API_KEY = '<your api key here>'
-API_SECRET = '<your api secret here>'
-ETHEREUM_ADDRESS = '<the address of the bot>'
+API_KEY = os.environ['API_KEY']
+API_SECRET = os.environ['API_SECRET']
+ETHEREUM_ADDRESS = os.environ['ETHEREUM_ADDRESS']
+print(API_KEY, API_SECRET, ETHEREUM_ADDRESS)
 WEB3_URL = 'http://localhost:8545'   # this is the default for parity
 
 web3 = Web3(HTTPProvider(WEB3_URL))
@@ -90,7 +96,6 @@ def authenticated_request(URL, method, body):
 
     return request
 
-
 def new_market_order(baseTokenAddress, quoteTokenAddress, side, orderAmount, feeOption='feeInNative'):
     reserve_body = {
         'baseTokenAddress':baseTokenAddress,
@@ -100,7 +105,7 @@ def new_market_order(baseTokenAddress, quoteTokenAddress, side, orderAmount, fee
         'feeOption':feeOption
     }
     reserve_request = authenticated_request(RESERVE_MARKET_ORDER, 'POST', reserve_body)
-
+    print(reserve_request.text)
     signed_order = signOrder(json.loads(reserve_request.text)['unsignedOrder'])
     market_order_ID = json.loads(reserve_request.text)['marketOrderID']
 
@@ -112,7 +117,6 @@ def new_market_order(baseTokenAddress, quoteTokenAddress, side, orderAmount, fee
     place_request = authenticated_request(PLACE_MARKET_ORDER, 'POST', place_body)
 
     history_request = authenticated_request(USER_HISTORY, 'GET', {})
-
 
 new_market_order(
     '0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570',
